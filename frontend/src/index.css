@@ -1,0 +1,48 @@
+
+@import "tailwindcss";
+:root {
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+  line-height: 1.5;
+  font-weight: 300;
+
+
+  /* Backgrounds */
+  --bg-main: #F9FAFB;
+  --bg-sidebar: #F3F4F6;
+  --bg-input: #FFFFFF;
+  --bg-chat-other: #E5E7EB;
+  --bg-chat-you: #3B82F6;
+  --bg-hover: #E0F2FE;
+
+  /* Text */
+  --text-main: #111827;
+  --text-secondary: #6B7280;
+  --text-on-chat-you: #FFFFFF;
+  --text-on-chat-other: #111827;
+
+  /* Borders / Dividers */
+  --border-default: #E5E7EB;
+
+  /* Status Colors */
+  --status-online: #10B981;
+  --status-away: #F59E0B;
+  --status-offline: #EF4444;
+
+  /* Accent / Primary */
+  --primary: #3B82F6;
+  --primary-dark: #2563EB;
+  --badge-new-message: #2563EB;
+
+
+
+
+  --gradient-bg-light: linear-gradient(rgba(249, 250, 251, 0.4), rgba(243, 244, 246, 0.8));
+  --gradient-bg-dark: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+  --gradient-chat-you: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  --gradient-chat-other: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
+  --gradient-badge: linear-gradient(to right, #2563EB, #3B82F6);
+
+}
+
