@@ -35,9 +35,14 @@ const uploadOnCloudinary = async (localFilePath)=>{
         return resp;
     } catch (error) {
         console.log("Error Occured while uploading File on Cloudinary");
-            fs.unlinkSync(localFilePath)
+        fs.unlinkSync(localFilePath)
         return null;    
     }
 }
 
-module.exports = uploadOnCloudinary;
+const deleteFile = async (localFilePath)=>{
+    fs.unlinkSync(localFilePath);
+}
+
+// uploads done 
+module.exports = { uploadOnCloudinary, deleteFile };

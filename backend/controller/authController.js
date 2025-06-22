@@ -10,7 +10,8 @@ const {
 
   sendEmail,
 
-  uploadOnCloudinary
+  uploadOnCloudinary,
+  deleteFile
 } = require("../utils");
 const { StatusCodes } = require("http-status-codes");
 const { attachCookiesToResponse } = require("../utils");
@@ -74,7 +75,7 @@ const registerUser = async (req, res) => {
     profilePic: profilePicCloudinary.secure_url,
   });
   console.log("here we are before saving ");
-  
+  await deleteFile(req.file.path);
   // await user.save();
   const newlyCreatedUser = await User.findById(user._id).select("-password");
 

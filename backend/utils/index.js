@@ -9,7 +9,7 @@ const  createTokenPayload  = require("./createTokenPayload");
 
 const sendEmail = require('./sendEmail')
 
-const uploadOnCloudinary = require('./cloudinary')
+const {uploadOnCloudinary,deleteFile} = require('./cloudinary')
 module.exports = {
   createHash,
 
@@ -25,4 +25,5 @@ module.exports = {
   sendEmail,
 
   uploadOnCloudinary,
+  deleteFile,
 };
