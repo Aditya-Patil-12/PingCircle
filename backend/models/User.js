@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema(
 // Never give callback because it does have it's inherits this
 // always use function
 userSchema.pre('save',async function (next){
-  if( this.isModified(this.password) ) {
+  // this.isModified(field which you is modified in string )
+  if( this.isModified('password') ) {
     this.password = await bcrypt.hash(this.password,11);
   }
   return next();
@@ -36,7 +37,15 @@ userSchema.pre('save',async function (next){
 // Methods on Scehma ====================================================================
 // even if we await here we need to write await functionCall()
 userSchema.methods.isPasswordCorrect = async function (password){
-  return await bcrypt.compare(password,this.password);
+  try {
+    console.log(this.password," ",password);
+    
+    return await bcrypt.compare(password,this.password);
+    
+  } catch (error) {
+    console.log(error);
+  }
+
 }
 
 const User = mongoose.model("User", userSchema);

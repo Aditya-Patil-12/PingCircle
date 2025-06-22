@@ -26,7 +26,7 @@ const app = express();
 app.use(cors())
 app.use(morgan('tiny'));
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser(process.env.COOKIE_SECRET))
 // ============================
 
 app.get('/',(req,res)=>{

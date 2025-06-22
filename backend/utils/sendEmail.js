@@ -2,12 +2,12 @@ const {Resend} = require("resend");
 
 const resend = new Resend("");
 
-const sendEmail = async  () => {
+const sendEmail = async  ({name,email,token,origin}) => {
   const { data, error } = await resend.emails.send({
     from: "Acme <onboarding@resend.dev>",
-    to: ["aditypatil71@gmail.com"],
+    to: [`${email}`],
     subject: "Hello World",
-    html: "<strong>It works!</strong>",
+    html: `Here is the password resetting link <strong>${token}</strong>`,
   });
 
   if (error) {

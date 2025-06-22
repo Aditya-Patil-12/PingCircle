@@ -8,9 +8,9 @@ const {
   forgotPassword,
   resetPassword,
 } = require("../controller/authController");
+const {upload} = require("../middleware/");
 
-
-router.route('/register').post(registerUser);
+router.route('/register').post(upload.single('profilePic'),registerUser);
 router.route('/login').post(loginUser);
 router.route('/logout').get(logoutUser);
 router.route('/forgot-password').post(forgotPassword);
