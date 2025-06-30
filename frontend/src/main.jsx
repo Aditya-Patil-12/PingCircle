@@ -1,31 +1,40 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
+// ALWAYS VITE_  => While creating environment variable  ....
+const clientId=import.meta.env.VITE_GOOGLE_CLIENT_ID ;
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
 
-// Chakara Provider ============
-import { ChakraProvider } from "@chakra-ui/react";
-// =============================
+// Redux =====================
+import {Provider} from 'react-redux'
+import store from './.config/store.js'
+// ===========================
 
-// Auth0 Import ===============
-import {Auth0Provider} from '@auth0/auth0-react' 
+// reactOAuth Import ===============
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { toast } from "react-toastify";
 // ============================
 
 // JSX imports ================
-import App from './App.jsx'
+import App from "./App.jsx";
 // ============================
 
+console.log(clientId);
+
+console.log(window.origin)
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ChakraProvider>
-      <Auth0Provider
-        domain="dev-ve28tt10m52ky88p.us.auth0.com"
-        clientId="ZF6Rd1oxIdg66yZuJjnjqkUot1qArA2S"
-        authorizationParams={{
-          redirect_uri: window.location.origin+"/chats",
-        }}
-      >
+    <GoogleOAuthProvider clientId={clientId} onScriptLoadSuccess={()=>{
+      console.log("Google Consent Screen Loaded Successfully.......................");
+    }}
+    onScriptLoadError={()=>{
+      console.log("Loading Google Login Script Failed .....");
+      toast.error("Please Reload the Page and try to Continue With Google Again !!!!!!")
+    }}
+    >
+      <Provider store={store}>
         <App />
-      </Auth0Provider>
-    </ChakraProvider>
+      </Provider>
+    </GoogleOAuthProvider>
   </StrictMode>
 );
+

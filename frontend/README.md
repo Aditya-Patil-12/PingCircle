@@ -24,3 +24,13 @@ If you are developing a production application, we recommend using TypeScript wi
   "updated_at": "2025-06-20T12:19:54.243Z"
 }
 ```
+
+
+
+### 23/06/25 
+- Switched to Material UI and React Router DOM 7.6.2 
+- Uninstalled the Chakara UI
+
+### 27/0/2025 
+- Please clean the credentials written in backend (googleAuthController) .....
+- Also the auth Controller

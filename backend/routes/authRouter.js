@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const {
@@ -6,14 +6,22 @@ const {
   logoutUser,
   registerUser,
   forgotPassword,
-  resetPassword,
+  socialLoginUser,
+  verifyEmail,
+  verificationFieldToken,
+  showMeUser,
 } = require("../controller/authController");
-const {upload} = require("../middleware/");
-
-router.route('/register').post(upload.single('profilePic'),registerUser);
-router.route('/login').post(loginUser);
-router.route('/logout').get(logoutUser);
-router.route('/forgot-password').post(forgotPassword);
-router.route('/reset-password').post(resetPassword);
-
+const {
+  googleAuthUser,
+} = require("../controller/socialLoginController/googleAuthController");
+const { upload } = require("../middleware/");
+const {authenticateUser} = require('../middleware');
+router.route("/register").post(upload.single("profilePic"), registerUser);
+router.route("/login").post(loginUser);
+router.route("/logout").get(logoutUser);
+router.route("/showMe").get(authenticateUser,showMeUser);
+router.route("/forgot-password/:email").get(forgotPassword);
+router.route("/socialLogin/:socialType").post(socialLoginUser);
+router.route("/verifyEmail/:email").get(verifyEmail);
+router.route("/verifyFieldToken").post(verificationFieldToken);
 module.exports = router;

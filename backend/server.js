@@ -23,9 +23,14 @@ const app = express();
 //     origin:process.env.CORS_ORIGIN,
 //     credentials:true,
 // }))
-app.use(cors())
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true,
+}))
+app.use(express.urlencoded({extended:true}));
 app.use(morgan('tiny'));
 app.use(express.json());
+console.log(app.request.body, "::::  ", app.request.baseUrl);
 app.use(cookieParser(process.env.COOKIE_SECRET))
 // ============================
 

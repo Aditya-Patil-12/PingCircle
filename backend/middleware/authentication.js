@@ -1,62 +1,46 @@
-// const CustomError = require("../errors");
-const { isTokenValid } = require("../utils/jwt");
-const {Token} = require('../models');
-const {attachCookiesToResponse} = require('../');
+const {Token, User} = require('../models');
+const {
+  ApiError,
+  createTokenPayload,
+  attachCookiesToResponse,
+  isTokenValid,
+} = require("../utils");
 const authenticateUser = async (req, res, next) => {
+  
   const { refreshToken,accessToken } = req.signedCookies;
-
+  console.log(refreshToken," ",accessToken);
   try {
     if( accessToken ){
-        const payload = isTokenValid(accessToken);
-        req.user = payload.user ;
-        return next();
+      const payload = isTokenValid(accessToken, "accessToken");
+      console.log("the Access token :::::::::: ",payload);
+      
+      req.user = payload;
+      next();
+      return ;
     }
-    const payload = isTokenValid(refreshToken);
-    const existingToken = await Token.findOne({user:payload.user.userId,
+    if( !refreshToken ){
+      throw new ApiError(400,"Please Login");
+    }
+    let payload = isTokenValid(refreshToken,"refreshToken");
+    console.log(refreshToken);
+    
+    const existingToken = await Token.findOne({userId:payload.userId,
         refreshToken : payload.refreshToken,
     });
-
-    if( !existingToken || !existingToken?.isValid ){
+    if( (!existingToken) || (!existingToken?.isValid) ){
         // throw an error ....
+        throw new ApiError("Please Login Again !!!");
     }
-    attachCookiesToResponse();
-    req.user = payload.user;
+    const user  = await User.findOne({_id:payload.userId});
+    payload = createTokenPayload(user); 
+    console.log("Checking The Payload",payload);
+    
+    req.user= payload;
+    // attachCookiesToResponse({res,payload,refreshToken:payload.refreshToken});
     next();
   } catch (error) {
-    // throw new Error();
+    throw error;
   }
 };
 
-const authorizePermissions = (...roles) => {
-  // console.log("in authorizePermissions",roles);
-
-  return (req, res, next) => {
-    // console.log(roles);
-
-    const userRole = req.user.role;
-
-    const findIndex = roles.findIndex((role) => role === userRole);
-    console.log(findIndex, " ");
-
-    if (findIndex == -1) {
-      throw new CustomError.UnauthorizedError(
-        `Unauthorized to Access this route`
-      );
-    }
-    next();
-  };
-};
-const authorizeProduct = (req, res, next) => {
-  const { token } = req.signedCookies;
-  // this is the only difference
-  if (!token) return;
-  try {
-    const { name, userId, role } = isTokenValid({ token });
-    req.user = { name, userId, role };
-    //   console.log(req.user);
-  } catch (error) {
-    throw new CustomError.UnauthenticatedError("No Token Not Valid");
-  }
-  next();
-};
-module.exports = { authenticateUser, authorizePermissions, authorizeProduct };
+module.exports =authenticateUser;

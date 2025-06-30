@@ -13,14 +13,15 @@ const chatModel = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Message",
     },
-    groupAdmin: {
+    // TODO: use it is as array ....
+    groupAdmin: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-    },
+    }],
 },{
     timeStamps:true,
 });
 
 const Chat = mongoose.model("Chat", chatModel); 
 
-module.exports = Chat;
+module.exports = Chat

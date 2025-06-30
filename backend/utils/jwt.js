@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {ApiError} = require('../utils') 
+const {ApiError} = require('./ApiError') 
 const createJWT = ({payload,secret})=>{
   // if callback is supplied then it acts asynchronously 
   // jwt.sign(
@@ -14,6 +14,8 @@ const createJWT = ({payload,secret})=>{
     const token = jwt.sign(payload, secret);
     return token;
 }
+
+
 const isTokenValid = ( token , whichToken ) => {
   /*
     // if JWT Token is invalid or Secret is Wrong then  - synchronous
@@ -24,9 +26,17 @@ const isTokenValid = ( token , whichToken ) => {
     }
   */try {
     // this is a synchronous way of doing it
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    let payload =null;
+    if( whichToken == "accessToken" ){
+      payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    }
+    else {
+      payload = jwt.verify(token,process.env.REFRESH_TOKEN_SECRET);
+    }
+    // console.log(payload);
+    return payload;
   } catch (error) {
-    throw new ApiError(500,`${whichToken} token verifying Led to Error`);
+    // throw new ApiError(500,`${whichToken} token verifying Led to Error`);
   }
 };
 const attachCookiesToResponse = ({ res, payload, refreshToken}) => {
@@ -35,12 +45,12 @@ const attachCookiesToResponse = ({ res, payload, refreshToken}) => {
       secret: process.env.ACCESS_TOKEN_SECRET,
     });
     const refreshTokenJWT = createJWT({
-      payload: { payload, refreshToken },
+      payload: { userId:payload.userId, refreshToken },
       secret: process.env.REFRESH_TOKEN_SECRET,
     });
     // const oneDay = 1000*60*60*24 ;
-    const twoMintutes = 1000*60*2;
-    const threeMintutes = 1000*60*3;
+    const twoMintutes = 1000*60*5;
+    const threeMintutes = 1000*60*10;
     res.cookie("accessToken", accessTokenJWT, {
       httpOnly: true,
       expires: new Date(Date.now() + twoMintutes),

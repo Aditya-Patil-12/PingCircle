@@ -1,8 +1,5 @@
 import Login from "./Login";
-import SignUp from "./SignUp";
+import Register from "./Register";
+import VerifyEmail from './VerifyEmail'
 
-
-export {
-    Login,
-    SignUp
-}
+export { Login, Register, VerifyEmail };

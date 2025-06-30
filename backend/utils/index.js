@@ -1,15 +1,17 @@
-const createHash = require('./createHash');
-
 const ApiResponse = require('./ApiResponse');
 const ApiError = require('./ApiError');
-
-const {createJWT,isTokenValid,attachCookiesToResponse,expireCookie} = require('./jwt');
-
-const  createTokenPayload  = require("./createTokenPayload");
-
-const sendEmail = require('./sendEmail')
+const createHash = require('./createHash');
 
 const {uploadOnCloudinary,deleteFile} = require('./cloudinary')
+const sendEmail = require('./sendEmail')
+const sendVerificationEmailLink = require('./sendVerificationEmailLink')
+
+const  createTokenPayload  = require("./createTokenPayload");
+const {createJWT,isTokenValid,attachCookiesToResponse,expireCookie} = require('./jwt');
+
+
+
+
 module.exports = {
   createHash,
 
@@ -23,6 +25,7 @@ module.exports = {
   createTokenPayload,
 
   sendEmail,
+  sendVerificationEmailLink,
 
   uploadOnCloudinary,
   deleteFile,

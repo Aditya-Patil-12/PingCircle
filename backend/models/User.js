@@ -3,23 +3,29 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema(
   {
-    userName: { type: String, required: true , trim:true },
-    email: { type: String, required: true , unique:true , trim:true, },
+    userName: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, trim: true },
     phoneNo: { type: String, required: true },
     password: { type: String, required: true },
+    isEmailVerified: { type: Boolean, default: false },
     profilePic: {
       type: String,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
-    passwordToken :{
-      type:String,
-      default:null,
-    }
-    ,passwordTokenExpirationDate:{
-      type:Date,
-      default:null,
-    }
+    socialLoginType: {
+      type: String,
+      enum:["custom","google"],
+      default: "custom",
+    },
+    verificationToken: {
+      type: String,
+      default: null,
+    },
+    verificationTokenExpirationDate: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

@@ -10,19 +10,13 @@ cloudinary.config({
 // Log the configuration
 // {
 //   cloud_name: 'dvcj0krbo',
-//   api_key: '154154926577789',
-//   api_secret: 'EMBcp97hs9UXMIaEeDnpIy8GICI',
+//   api_key: '',
+//   api_secret: '',
 //   private_cdn: false,
 //   secure_distribution: null,
 //   secure: true
 // }
 console.log(cloudinary.config());
-
-// cloudinary.config({
-//   cloud_name: "my_cloud_name",
-//   api_key: "my_key",
-//   api_secret: "my_secret",
-// });
 
 
 const uploadOnCloudinary = async (localFilePath)=>{
