@@ -13,6 +13,33 @@ const userSchema = new mongoose.Schema(
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
+    chats:[
+      {
+        chatId:{
+          type:mongoose.Schema.Types.ObjectId,
+          ref:"Chat",
+          default:"",
+        },
+        chatName :{
+          type:String,
+          default:"No Chat Name default Value from mongoose"
+        },
+        chatType:{
+          type:String,
+          enum:["group","direct"],
+          default:"group",
+        },
+        currentMessage:{
+          type:mongoose.Schema.Types.ObjectId,
+          ref : "Message",
+          default:null,
+        },
+        chatPic:{
+          type:String,
+          default:"String",
+        }
+      }
+    ],
     socialLoginType: {
       type: String,
       enum:["custom","google"],

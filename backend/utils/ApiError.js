@@ -5,7 +5,7 @@ class ApiError extends Error {
     errors = [],
     stack = ""
   ) {
-    console.log(statusCode);
+    console.log(statusCode,"Bro Just Here the chcking for any error :::::::",message);
     
     super(message);
     this.statusCode = statusCode;
@@ -19,6 +19,8 @@ class ApiError extends Error {
     } else {
       Error.captureStackTrace(this, this.constructor);
     }
+    console.log("error created");
+    
   }
 }
 

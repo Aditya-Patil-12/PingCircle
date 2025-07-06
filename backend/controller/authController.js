@@ -147,7 +147,13 @@ const loginUser = async (req, res) => {
     attachCookiesToResponse({ res, payload: userTokenPayload, refreshToken });
     return res
       .status(StatusCodes.OK)
-      .json(new ApiResponse(StatusCodes.OK, user, "Login Succesfull"));
+      .json(
+        new ApiResponse(
+          StatusCodes.OK,
+          { userName:user.userName, email: user.email, _id:user._id },
+          "Login Succesfull"
+        )
+      );
   }
   refreshToken = crypto.randomBytes(40).toString("hex");
   const userAgent = req.headers["user-agent"];
@@ -161,6 +167,8 @@ const loginUser = async (req, res) => {
   await Token.create(userToken);
   attachCookiesToResponse({ res, payload: userTokenPayload, refreshToken });
   const { userName, email: userEmail, _id } = user;
+  console.log("This the information to be sent ", { userName, email: userEmail, _id });
+  
   return res
     .status(StatusCodes.OK)
     .json(

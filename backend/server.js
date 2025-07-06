@@ -13,10 +13,11 @@ const {connectDB} = require('./.config');
 // Router Imports =============
 const baseRoute = "/api/v1";
 const authRouter = require('./routes/authRouter');
+const userRouter = require('./routes/userRouter');
+const chatRouter = require('./routes/chatRouter');
 // ============================
 
 const app = express();
-
 
 // Middleware =================
 // app.use(cors({
@@ -38,10 +39,10 @@ app.get('/',(req,res)=>{
     res.send('<h1>Hello</h1>');
 })
 
-
 // Routers Added =========
 app.use((baseRoute+'/auth'),authRouter);
-
+app.use(baseRoute + "/users", userRouter);
+app.use(baseRoute + "/chats", chatRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
@@ -53,14 +54,12 @@ app.use(errorHandlerMiddleware);
 const PORT= process.env.PORT || 5000;
 const startServer = async ()=>{
     try {
-        await connectDB();
-        app.listen(PORT,()=>{
-            console.log(`Server started Listening on PORT ${PORT}`)
-        })
+          await connectDB();
+          app.listen(PORT,()=>{
+              console.log(`Server started Listening on PORT ${PORT}`)
+          })     
     } catch (error) {
-        console.log("There was a error ::: "," ",`${error.message}`); 
+        console.log("There was a error ::: "," ",`${error.message}`);
     }
 }
 startServer();
-
-

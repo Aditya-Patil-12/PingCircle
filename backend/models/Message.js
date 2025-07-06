@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
-const messageModel = new mongoose.Schema(
+const messageSchema = new mongoose.Schema(
 {
     sender: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-    chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
+    chatId: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
     // TODO :  Content can be a text , file , audio , video
     content: { type: "String" ,default:""},
 },
@@ -14,7 +14,7 @@ const messageModel = new mongoose.Schema(
     timeStamps: true,
 }
 );
-
-const Message = mongoose.model("Message", messageModel);
+// return new Document with the given Schema
+const Message = mongoose.model("Message", messageSchema);
 
 module.exports = Message;
