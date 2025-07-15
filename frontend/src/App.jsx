@@ -1,12 +1,13 @@
 import './App.css'
 // React and External Library Imports ====================
-import { useState } from 'react'
+import { Component, useState } from 'react'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { ToastContainer } from 'react-toastify'; 
 //=======================================================
 
 // JSX Imports ====
+import ProtectedPage from './utils/ProtectedPage';
 import {
   HomePage,
   LandingPage,
@@ -16,8 +17,11 @@ import {
   VerificationPage,
   VerifyEmailPage,
   ResetPasswordPage,
-  ForgotPasswordPage
+  ForgotPasswordPage,
+  AuthPage,
+  ProfilePage,
 } from "./pages";
+import UnProtectedPage from './utils/UnProtectPage';
 // ================
 
 // routes are first argument to createBrowserRouter [ ]
@@ -30,37 +34,53 @@ const router = createBrowserRouter([
     path: "/auth",
     Component: LandingPage,
     children: [
-      {
-        path: "login",
-        index: true,
-        Component: LoginPage,
-      },
-      {
-        path: "register",
-        Component: RegisterPage,
-      },
-      {
-        path: "verifyEmail",
-        Component: VerifyEmailPage,
-      },
-      {
-        path: "verifyField",
-        Component: VerificationPage,
-      },
-      {
-        path: "recoveryPassword",
-        Component: ForgotPasswordPage,
-      },
-      {
-        path: "resetPassword",
-        Component: ResetPasswordPage,
-      },
+          {
+            path: "login",
+            Component: UnProtectedPage,
+            children: [
+              {
+                index: true,
+                Component: LoginPage,
+              },
+            ],
+          },
+          {
+            path: "register",
+            Component: RegisterPage,
+          },
+          {
+            // this is protected .....
+            Component: ProtectedPage,
+            children: [
+              {
+                path: "verifyEmail",
+                Component: VerifyEmailPage,
+              },
+            ],
+          },
+          {
+            // this has to be protecteed , plus cookies should have time >= verificationTokenExpirationTIme
+            path: "verifyField",
+            Component: VerificationPage,
+          },
+          {
+            path: "recoveryPassword",
+            Component: ForgotPasswordPage,
+          },
+          {
+            path: "resetPassword",
+            Component: ResetPasswordPage,
+          },
     ],
   },
   {
     path: "/chats",
     Component: ChatPage,
   },
+  {
+    path:"/profile",
+    Component: ProfilePage
+  }
 ]);
 
 function App() {

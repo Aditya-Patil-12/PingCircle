@@ -8,6 +8,8 @@ import VerificationPage from "./VerificationPage";
 import VerifyEmailPage from "./VerifyEmailPage";
 import ResetPasswordPage from "./auth/ResetPasswordPage";
 import ForgotPasswordPage from "./auth/ForgotPasswordPage";
+import AuthPage from "./auth/AuthPage";
+import ProfilePage from "./ProfilePage";
 export {
   HomePage,
   ChatPage,
@@ -18,4 +20,6 @@ export {
   VerifyEmailPage,
   ResetPasswordPage,
   ForgotPasswordPage,
+  AuthPage,
+  ProfilePage,
 };

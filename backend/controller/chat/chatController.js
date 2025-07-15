@@ -130,6 +130,23 @@ const exitChat = async (req,res) =>{
   }
   return ;
 }
+
+const getChatHelper = async (userId, chatId) => {
+  console.log(chatId);
+
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    throw new ApiError(400, "There Does not Exists Such Group");
+  }
+  if (!checkForGroupMember(chat.members, userId)) {
+    throw new ApiError(401, "Please Be A Member of Group ");
+  }
+  await chat.populate({
+    path: "members",
+    select: "userName email phoneNo profilePic chats",
+  });
+  return chat;
+};
 module.exports = {
   createChat,
   deleteChat,
@@ -138,4 +155,5 @@ module.exports = {
   modifyGroupMembers,
   modifyGroupAdmins,
   exitChat,
+  getChatHelper,
 };
