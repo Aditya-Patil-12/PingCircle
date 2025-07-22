@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
         chatId:{
           type:mongoose.Schema.Types.ObjectId,
           ref:"Chat",
-          default:"",
+          default:null,
         },
         chatName :{
           type:String,

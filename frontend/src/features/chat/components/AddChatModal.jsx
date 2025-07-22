@@ -25,10 +25,10 @@ const SingleUser = ({user}) =>{
       </div>
     );
 }
-const AddChatModal = ({ setShowAddChatModal }) => {
-    const [options,setOptions] = useState(0);
-    console.log(options);
-    
+const AddChatModal = ({ setShowAddChatModal, setSeeChatDetails }) => {
+  const [options, setOptions] = useState(0);
+  console.log(options);
+
   return (
     <div
       className="w-full h-full chatModal bg-transperent absolute z-20"
@@ -52,12 +52,14 @@ const AddChatModal = ({ setShowAddChatModal }) => {
             setShowAddChatModal={setShowAddChatModal}
             options={options}
             setOptions={setOptions}
+            setSeeChatDetails={setSeeChatDetails}
           />
         ) : (
           <GroupModalContent
             setShowAddChatModal={setShowAddChatModal}
             options={options}
             setOptions={setOptions}
+            setSeeChatDetails={setSeeChatDetails}
           />
         )}
       </div>

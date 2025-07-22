@@ -4,47 +4,69 @@ import { useRef,useState,useEffect } from 'react';
 
 // Components ==============
 import { Chat,AllChats,ChatNavbar,AddChatModal } from '../features/chat/components'
-// =========================
-
-
+import AddGroupMembersModal from '../features/chat/components/modalContent/AddGroupMembersModal';
 // constants ==================
 const SERVER_ENDPOINT = import.meta.env.VITE_SERVER_ENDPOINT;
+// redux imports ====================
+import { useDispatch, useSelector } from 'react-redux';
+import { addMessage } from '../features/messsage/MessageSlice';
+//=================================== 
 
 
-
-
-const ChatPage = () => { 
-  const [click, setClick] = useState(0)
-  const socket = useRef(null);
+const ChatPage = () => {
+  const [seeChatDetails, setSeeChatDetails] = useState("")
   const [showAddChatModal,setShowAddChatModal] = useState(false);
   const [showChatsOrChatInfo, setShowChatsOrChatInfo] = useState(false);
+  const [addGroupMembersModal, setAddGroupMembersModal] = useState(false);
+  const userId = useSelector ((state)=>state.user.userId);
+  const dispatch = useDispatch();
   console.log(showAddChatModal);
+  const socket = useRef(null);
 
-  // useEffect(()=>{
-  //     socket.current = io(SERVER_ENDPOINT);
+  useEffect(()=>{
+      socket.current = io(SERVER_ENDPOINT);
       
-  //     socket.current.emit("joinChat", { _id: "1234" });
-  //     socket.current.on("connected", () => {
-  //       console.log("Client Side Connection Done");
-  //     });
+      socket.current.emit("joinPersonalChat",{_id:userId});
+      socket.current.on("connected", () => {
+        console.log("Client Side Connection Done");
+      });
+      return () =>{
+        socket.current.disconnect();
+      }
+  },[userId]);
+useEffect(() => {
+  const handler = async (data) => {
+    await dispatch(addMessage(data.message));
+    console.log("Check Message", data);
+  };
 
-  //     return () =>{
-  //       socket.current.disconnect();
-  //     }
-  // },[]);
-  // useEffect(()=>{
+  socket.current.on("recieveNewMessage", handler);
 
-  // })
+  // Cleanup function to remove listener
+  return () => {
+    socket.current.off("recieveNewMessage", handler);
+  };
+}, [dispatch]);
 
-  // useEffect(()=>{
-  //   // For every Render .....
-  //   socket.emit("newMessage",{data:12345});
-  // })
+
+
   return (
     <div className="h-screen overflow-y-auto relative">
       {showAddChatModal ? (
-        <AddChatModal setShowAddChatModal={setShowAddChatModal} />
+        <AddChatModal
+          setShowAddChatModal={setShowAddChatModal}
+          seeChatDetails={seeChatDetails}
+          setSeeChatDetails={setSeeChatDetails}
+        />
       ) : null}
+      {addGroupMembersModal ? (
+        <AddGroupMembersModal
+          seeChatDetails={seeChatDetails}
+          setSeeChatDetails={setSeeChatDetails}
+          setAddGroupMembersModal={setAddGroupMembersModal}
+        />
+      ) : null}
+
       <nav className="ChatNavbar w-full h-1/15 ">
         <ChatNavbar
           showAddChatModal={showAddChatModal}
@@ -61,6 +83,8 @@ const ChatPage = () => {
             <AllChats
               isSmall={true}
               setShowChatsOrChatInfo={setShowChatsOrChatInfo}
+              setSeeChatDetails={setSeeChatDetails}
+              seeChatDetails={seeChatDetails}
             />
           </div>
           <div
@@ -71,14 +95,30 @@ const ChatPage = () => {
             <Chat
               isSmall={true}
               setShowChatsOrChatInfo={setShowChatsOrChatInfo}
+              seeChatDetails={seeChatDetails}
+              setSeeChatDetails={setSeeChatDetails}
+              addGroupMembersModal={addGroupMembersModal}
+              setAddGroupMembersModal={setAddGroupMembersModal}
+              socket={socket}
             />
           </div>
         </div>
         <div className="hidden lg:w-1/3 lg:block">
-          <AllChats isSmall={false} />
+          <AllChats
+            isSmall={false}
+            setSeeChatDetails={setSeeChatDetails}
+            seeChatDetails={seeChatDetails}
+          />
         </div>
         <div className="hidden lg:w-2/3 lg:block">
-          <Chat isSmall={false} />
+          <Chat
+            isSmall={false}
+            seeChatDetails={seeChatDetails}
+            setSeeChatDetails={setSeeChatDetails}
+            addGroupMembersModal={addGroupMembersModal}
+            setAddGroupMembersModal={setAddGroupMembersModal}
+            socket={socket}
+          />
         </div>
       </div>
     </div>

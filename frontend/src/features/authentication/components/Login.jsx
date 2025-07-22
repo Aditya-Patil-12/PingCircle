@@ -34,7 +34,6 @@ import { FaArrowRight } from "react-icons/fa";
 
 
 const Login = () => {
-    // console.log(window.location.origin);
     const auth = useSelector((state)=>state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -45,7 +44,6 @@ const Login = () => {
     const handleChange = (inputType,value) =>{
         setFormInput({ ...formInput, [inputType]: value }); 
     }
-    // console.log(formInput);
     const submitHandler = async (e )=>{
         e.preventDefault();
         
@@ -57,8 +55,8 @@ const Login = () => {
           }
         }
         const resp= await dispatch(checkUserAsync(formInput));
-        console.log("next thing to focus at ",await resp);
-        if( await resp ){
+        console.log("next thing to focus at ", resp);
+        if( resp ){
           const {userId,msg} = await resp.payload;
           if (userId) {
             toast.success(msg,{
@@ -97,19 +95,8 @@ const Login = () => {
         toast.error(`Some non Auth Error ${errorResponse} !`);
       }
     });
-    console.log(formInput);
-    useEffect(()=>{
-      // dispatch my Action to seach
-      const helper = async ()=>{
-        const resp = await dispatch(showMeUserAsync());
-        console.log(resp);
-        if( resp.payload.success ){
-          // show a popup to login with that User ......
-          navigate("/auth/verifyEmail");
-        }
-      }
-      helper();
-    },[])
+    // console.log(formInput);
+
   return (
     <section className="loginForm bg-white w-[30%] my-12 rounded-xl shadow-2xl">
       <form onSubmit={submitHandler}>

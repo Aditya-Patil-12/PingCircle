@@ -49,8 +49,8 @@ const attachCookiesToResponse = ({ res, payload, refreshToken}) => {
       secret: process.env.REFRESH_TOKEN_SECRET,
     });
     // const oneDay = 1000*60*60*24 ;
-    const twoMintutes = 1000*60*5;
-    const threeMintutes = 1000*60*10;
+    const twoMintutes = 1000*60*20;
+    const threeMintutes = 1000*60*20;
     res.cookie("accessToken", accessTokenJWT, {
       httpOnly: true,
       expires: new Date(Date.now() + twoMintutes),

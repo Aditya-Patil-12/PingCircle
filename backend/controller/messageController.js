@@ -1,6 +1,6 @@
 const {Message,Chat} = require('../models')
 const {checkForGroupMember} = require('../utils')
-console.log(checkForGroupMember);
+// console.log(checkForGroupMember);
 
 // here this thing creates circular imports ===>
 // const{getChatHelper} = require('./chat/chatController')
@@ -26,7 +26,7 @@ const deleteAllMessagesofAUserInAChat = async (chatId,userId) =>{
 }
 
 const getChatHelper = async (userId, chatId) => {
-  console.log(chatId);
+  // console.log(chatId);
 
   const chat = await Chat.findById(chatId);
   if (!chat) {
@@ -57,23 +57,23 @@ const sendMessage = async (req,res) =>{
   });
   // console.log(newMessage);
   // await newMessage;
-  console.log(newMessage);
+  // console.log(newMessage);
   await newMessage.populate({
     path: "sender",
     select: "userName email phoneNo profilePic",
   }); 
   // send the new Message everywhere
   // change the Latest Message for every User Chats ...
-  return res.status(200).json(new ApiResponse(200, "Message Sent to other Guys successfully"));
+  return res.status(200).json(new ApiResponse(200, newMessage,"Message Sent to other Guys successfully"));
 }
 const fetchMessageForAChat = async (req,res) =>{
   const {chatId} = req.params;
   // we need to check if the user is of the same Group ....
-  const messages = await Message.findOne({chatId});
+  const messages = await Message.find({chatId});
 
   return res
     .status(200)
-    .json(new ApiResponse(200, messages));
+    .json(new ApiResponse(200, messages || []));
 }
 
 

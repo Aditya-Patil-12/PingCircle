@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import {
 checkVerificatonTokenFieldOfUserAsync
 } from "../AuthSlice";
+import { createSelfChatAsync } from '../../chat/ChatSlice';
+import {showCurrentUserAsync} from '../../user/UserSlice'
 import ResetPassword from './ResetPassword';
 // =======================
 const Verification = () => {
@@ -22,19 +24,22 @@ const Verification = () => {
         setQuery(temp);
     },[searchParams]);
 
+
     useEffect(()=>{
         if( (query?.verify) ){
             if( (query.verify == "email") ){
                 console.log("called it ");
-                
-                dispatch(checkVerificatonTokenFieldOfUserAsync({query,body:{isEmailVerified:true}}));
-
-                navigate("/chats");
+                const check = async () =>{
+                    await dispatch(checkVerificatonTokenFieldOfUserAsync({query,body:{isEmailVerified:true}}));
+                    await dispatch(createSelfChatAsync());
+                    await dispatch(showCurrentUserAsync());
+                    navigate("/chats");
+                } 
+                check();
             }
         }
     },[query]);
     console.log(query," ");
-    
   return (
     <div>
         {

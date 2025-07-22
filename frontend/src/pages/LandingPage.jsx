@@ -3,13 +3,11 @@ import { Link,Outlet ,useNavigate ,useLocation} from "react-router-dom";
 const LandingPage = () => {
   const navigate = useNavigate();
   const path = useLocation();
-  useEffect(()=>{
-    console.log(path);
-    
-    if( path.pathname == "/auth"){
-      navigate("/auth/login")
+  useEffect(() => {
+    if (path.pathname == "/auth") {
+      navigate("/auth/login");
     }
-  },[]);
+  }, [path]);
 
   return (
     // flex-col == > Horizontal Centering then items-center

@@ -4,6 +4,8 @@ const {createUserChat}  = require('../../utils');
 const { addAChatToUser } = require('../userController');
 
 const createSelfChat = async (req,res)=>{
+  console.log("IN self Chat");
+  
     const {userId} = req.user;
     const isChatAlreadyExist = await SelfChat.findOne({userId});
     if( isChatAlreadyExist ){

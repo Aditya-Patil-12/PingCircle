@@ -1,7 +1,7 @@
 // React Imports Normal Library imports =====
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 // ==========================================
 
 // MUI Imports =======================
@@ -11,26 +11,48 @@ import { Button } from "@mui/material";
 // Redux Imports =========
 import { useDispatch, useSelector } from "react-redux";
 import { startEmailVerificationOfUserAsync } from "../AuthSlice";
+import { showCurrentUserAsync } from "../../user/UserSlice";
 // =======================
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
   const [isEmailSent, setIsEmailSent] = useState(false);
   const auth = useSelector((state) => state.auth);
-  console.log(auth);
-
+  console.log("Just after Imports ::: ", auth);
   const dispatch = useDispatch();
-  // if (auth.isEmailVerified) {
 
-  //   navigate("/chats");
-  // }
-  useEffect(() => {
-    if (auth.isEmailVerified) {
-      navigate("/chats");
+  // useEffect(() => {
+  //   console.log("I in useEffect :: ",auth);
+  //   // setTimeout(async ()=>{
+  //     if (auth.isEmailVerified) {
+  //         console.log("ready to navigate :: ",auth);
+  //         const help = async () =>{
+  //           await dispatch(showCurrentUserAsync());
+  //           navigate("/chats");
+  //         }
+  //         help();
+  //       }
+  //       if( !auth.isLogin ){
+  //         navigate('/auth/login');
+  //       }
+  //       // },2000);
+  //     }, []);
+    if( auth.isEmailVerified ){
+      // we can need tos showUser
+      const help = async () => await dispatch(showCurrentUserAsync());
+      help();
+      return <Navigate to="/chats"/>;        
     }
-  }, [auth.isEmailVerified]);
+    if( !(auth.isLogin) || !(auth.userId) ){
+      return <Navigate to="/auth/login"/>;        
+    }
   return !isEmailSent ? (
     <div className="mt-10 mb-5 text-center">
+      <Button onClick={()=>{
+        navigate('/auth/login');
+      }}>
+        CLick
+      </Button>
       <h1 className="text-3xl font-bold mb-5">
         Verify your Email by clicking on below button
       </h1>

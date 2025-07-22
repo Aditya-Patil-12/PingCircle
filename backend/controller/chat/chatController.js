@@ -30,11 +30,11 @@ const createChat = async (req, res) => {
   console.log(isGroupChat);
   
   if (!isGroupChat) {
-    createOneToOneChat(req,res);
+    await createOneToOneChat(req,res);
     return ;
   }
-  createGroupChat(req,res);
-  return ;
+  await createGroupChat(req,res);
+  return;
 };
 
 const deleteChat = async (req, res) => {
@@ -69,6 +69,7 @@ const deleteChat = async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "Chat Deleted SuccessFully "));
 };
+
 const getChat = async (req, res) => {
   const { userId } = req.user;
   const { chatId } = req.params;
@@ -87,7 +88,7 @@ const getChat = async (req, res) => {
   });
   return res
     .status(200)
-    .json(new ApiResponse(200, chat, "Chat Deleted SuccessFully "));
+    .json(new ApiResponse(200, chat, `${chat?.chatName ? chat.chatName : ''} retrived successfully`));
 };
 const updateChat = async (req, res) => {
   const { userId } = req.user;
@@ -155,5 +156,4 @@ module.exports = {
   modifyGroupMembers,
   modifyGroupAdmins,
   exitChat,
-  getChatHelper,
 };

@@ -34,53 +34,66 @@ const router = createBrowserRouter([
     path: "/auth",
     Component: LandingPage,
     children: [
+      {
+        path: "login",
+        Component: UnProtectedPage,
+        children: [
           {
-            path: "login",
-            Component: UnProtectedPage,
-            children: [
-              {
-                index: true,
-                Component: LoginPage,
-              },
-            ],
+            index: true,
+            Component: LoginPage,
           },
+        ],
+      },
+      {
+        path: "register",
+        Component: RegisterPage,
+      },
+      {
+        // this is protected .....
+        Component: ProtectedPage,
+        children: [
           {
-            path: "register",
-            Component: RegisterPage,
+            path: "verifyEmail",
+            Component: VerifyEmailPage,
+            index:true,
           },
-          {
-            // this is protected .....
-            Component: ProtectedPage,
-            children: [
-              {
-                path: "verifyEmail",
-                Component: VerifyEmailPage,
-              },
-            ],
-          },
-          {
-            // this has to be protecteed , plus cookies should have time >= verificationTokenExpirationTIme
-            path: "verifyField",
-            Component: VerificationPage,
-          },
-          {
-            path: "recoveryPassword",
-            Component: ForgotPasswordPage,
-          },
-          {
-            path: "resetPassword",
-            Component: ResetPasswordPage,
-          },
+        ],
+      },
+      {
+        // this has to be protecteed , plus cookies should have time >= verificationTokenExpirationTime
+        path: "verifyField",
+        Component: VerificationPage,
+      },
+      {
+        path: "recoveryPassword",
+        Component: ForgotPasswordPage,
+      },
+      {
+        path: "resetPassword",
+        Component: ResetPasswordPage,
+      },
     ],
   },
   {
     path: "/chats",
-    Component: ChatPage,
+    Component: ProtectedPage,
+    children: [
+      {
+        index: true,
+        Component: ChatPage,
+      },
+    ],
   },
   {
-    path:"/profile",
-    Component: ProfilePage
-  }
+    path: "/profile",
+    Component: ProtectedPage,
+    children: [
+      {
+        index: true,
+        Component: ProfilePage,
+      },
+    ],
+  },
 ]);
 
 function App() {

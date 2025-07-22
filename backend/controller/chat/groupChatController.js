@@ -1,4 +1,4 @@
-const { GroupChat, Chat } = require("../../models");
+const { GroupChat, Chat, User } = require("../../models");
 const {ObjectId}  = require('mongoose').Types
 
 const {
@@ -29,7 +29,7 @@ const createGroupChat = async (req,res) =>{
   const doesChatNameAlreadyExists = await GroupChat.findOne({ chatName }).populate('members');
   
   if (doesChatNameAlreadyExists) {
-    await newChat.populate({
+    await doesChatNameAlreadyExists.populate({
       path: "members",
       select: "userName email phoneNo profilePic chats",
     });
@@ -43,7 +43,7 @@ const createGroupChat = async (req,res) =>{
             )
         );
     }
-    if (members.length < 2) {
+    if (members.length < 1) {
         throw new ApiError(400, "Chat Should Have Atleast Two Members");
     }
     if (/\d/.test(chatName)) {
@@ -76,9 +76,16 @@ const createGroupChat = async (req,res) =>{
         path: "members",
         select: "userName email phoneNo profilePic chats",
     });
+    const newlyModifiedUser = await User.findById(userId);
     return res
-        .status(201)
-        .json(new ApiResponse(201, newChat, `${chatName} Created Succesfully`));
+      .status(201)
+      .json(
+        new ApiResponse(
+          201,
+          { ...(newChat._doc), userChat: newlyModifiedUser.chats.at(-1) },
+          `${chatName} Created Succesfully`
+        )
+      );
 }
 
 const updateGroupChat = async (req,res) =>{
@@ -198,13 +205,17 @@ const deleteGroupMembers = async(chat,removeMembers) =>{
   await chat.set("groupAdmins", newAdmins);
   await chat.save();
   console.log("Delete Member Chat\n",await chat);
-  
+
+  // log
   // 2) User Update ......
   for (let newMember of verifiedMembersToBeRemoved) {
+    console.log("Check " ,newMember);
+    
     await deleteAChatOfUser(newMember,chat._id);
   }
   return;
 }
+
 const deleteGroupAdmins = async (chat, removeAdmins) =>{
   const superAdmin  = chat.createdByUser.toString();
   const checkAdmins = new Set();
@@ -351,8 +362,8 @@ const exitGroupChat = async (req,res) =>{
   console.log(userId.toString()," ",chat.createdByUser.toString());
   
   if( userId.toString() == chat.createdByUser.toString() ){
-    const {nextSuperAdmin} = req.body;
-    await exitSuperAdmin(chat,nextSuperAdmin);
+    const obj = req.body;
+    await exitSuperAdmin(chat,(obj && obj?.nextSuperAdmin));
     // chat = await GroupChat.findById(chatId);
   }
 

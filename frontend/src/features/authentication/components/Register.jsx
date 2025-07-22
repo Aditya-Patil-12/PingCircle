@@ -134,29 +134,20 @@ const SignUp = () => {
         },2500)
       } else {toast.error(msg+" !\n Please Try Again"); resetStatus("idle");}
     }
-    // const resp = await axios.post(
-    //   "http://localhost:5000/api/v1/auth/register",
-    //   formData
-    // );
-    // never works.....
-    // const resp = await axios.post(
-    //   "http://localhost:5000/api/v1/auth/register",
-    //   formInput
-    // );
-    // console.log(resp);
   };
-    useEffect(()=>{
-      // dispatch my Action to seach
-      const helper = async ()=>{
-        const resp = await dispatch(showMeUserAsync());
-        console.log(resp);
-        if( resp.payload.success ){
-          // show a popup to login with that User ......
-          navigate("/auth/verifyEmail");
-        }
+  // if cookies => verifyEmail
+  useEffect(()=>{
+    // dispatch my Action to seach
+    const helper = async ()=>{
+      const resp = await dispatch(showMeUserAsync());
+      console.log(resp);
+      if( resp.payload.success ){
+        // show a popup to login with that User ......
+        navigate("/auth/verifyEmail");
       }
-      helper();
-    },[])
+    }
+    helper();
+  },[])
   console.log(auth);
 
   // useEffect(()=>{

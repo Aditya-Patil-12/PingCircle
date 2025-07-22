@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   userId: null,
-  userEmail: "aditypatil71@gmail.com",
+  userEmail: null,
   isEmailVerified:false,
   isLogin: false,
   serverMsg:"",
@@ -17,6 +17,7 @@ import {
   checkVerficationResult,
   resetPasswordUser,
   showMeUser,
+  logoutUserAPI,
 } from "./AuthAPI";
 
 
@@ -117,22 +118,30 @@ const showMeUserAsync = createAsyncThunk(
   "auth/showMeUserAsyncDetails",
   async (_,thunkAPI) => {
     console.log("Show Me User\n");
-    console.log(showMeUser);
+    // console.log(showMeUser);
     
     const resp = await showMeUser();
 
-    console.log("Hey mannn ",resp);
-    if( resp ){
-      console.log("Hey mannn ",await resp);
-      
-    }
-    const { data, msg, success } = await resp;
-    if (!(await success)) {
+    console.log("Show Me User Server Response", resp);
+    const { data, msg, success } = resp;
+    if (!(success)) {
       return thunkAPI.rejectWithValue({ msg });
     }
-    return await { ...data,msg ,success };
+    return  { ...data,msg ,success };
   }
 ); 
+const logoutUserAsync = createAsyncThunk(
+  "auth/loguoutUserDetails",async (_,thunkAPI) =>{
+    const id = thunkAPI.getState().auth.userId;
+    const resp = await logoutUserAPI(id);
+    
+    console.log("Show Me User Server Response", resp);
+    const { data, msg, success } = resp;
+    if (!(success)) {
+      return thunkAPI.rejectWithValue({ msg });
+    }
+    return  { ...data,msg ,success };
+})
 
 // name , intialState reducers , extraReducers ......
 export const authSlice = createSlice({
@@ -150,6 +159,14 @@ export const authSlice = createSlice({
     },
     resetStatus:(state,action) => {
         state.status = action.payload;
+    },
+    resetAuth: (state) =>{
+        state.userEmail = null;
+        state.userId = null;
+        state.isEmailVerified = false;
+        state.serverMsg = null;
+        state.isLogin=false;
+        state.status = "idle";
     }
   },
   extraReducers: (builder) => {
@@ -189,6 +206,7 @@ export const authSlice = createSlice({
         state.userId = userId;
         state.isEmailVerified = isEmailVerified;
         state.serverMsg = msg;
+        state.isLogin = true;
         state.status = "idle";
       })
       .addCase(checkUserAsync.rejected, (state, action) => {
@@ -285,14 +303,11 @@ export const authSlice = createSlice({
         state.status = "loading";
       })
       .addCase(showMeUserAsync.fulfilled, (state, action) => {
-        console.log(
-          "inside thunk of showMeUserAsync ",
-          action.payload
-        );
-        const { _id,email,isEmailVerified,msg } = action.payload;
+        console.log("inside thunk of showMeUserAsync ", action.payload);
+        const { _id, email, isEmailVerified, msg } = action.payload;
 
         state.serverMsg = msg;
-        state.userId= _id;
+        state.userId = _id;
         state.userEmail = email;
         state.isEmailVerified = isEmailVerified;
         // state.userNa
@@ -302,12 +317,28 @@ export const authSlice = createSlice({
         state.status = "rejected";
         console.log("In Rejected State of showMeUserAsync", action.payload);
         state.serverMsg = action.payload.msg;
+      })
+      .addCase(logoutUserAsync.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(logoutUserAsync.fulfilled, (state, action) => {
+        console.log("inside thunk of logoutUserAsync ", action.payload);
+        state.userId= null;
+        state.userEmail= null;
+        state.isEmailVerified=null;
+        state.isLogin=null;
+        state.serverMsg="";
+      })
+      .addCase(logoutUserAsync.rejected, (state, action) => {
+        state.status = "rejected";
+        console.log("In Rejected State of logoutUserAsync", action.payload);
+        state.serverMsg = action.payload.msg;
       });
   },
 });
 
 // reducer**s** turn into actions ....
-export const { clearAuthUser, setIsLogin, resetStatus } = authSlice.actions;
+export const { clearAuthUser, setIsLogin, resetStatus, resetAuth } = authSlice.actions;
 
 export {
   createUserAsync,
@@ -317,6 +348,8 @@ export {
   checkVerificatonTokenFieldOfUserAsync,
   startResetPasswordOfUserAsync,
   showMeUserAsync,
+  logoutUserAsync,
+
 };
 
 // import this reducer .......

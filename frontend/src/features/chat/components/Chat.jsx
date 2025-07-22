@@ -1,62 +1,63 @@
-import { useEffect,useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect,useRef,useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ChatInfo from "./chatInfo/ChatInfo";
-const data = {
-  _id:12,
-  chatName:"Rockers",
-  chatProfilePic:"https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  members:[
-  {
-    _id: 1,
-    userName: "Aditya",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  {
-    _id: 2,
-    userName: "Suraj",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  {
-    _id: 3,
-    userName: "Roshani",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  {
-    _id: 4,
-    userName: "Chandani",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  {
-    _id: 5,
-    userName: "Phulchand",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },]
-};
-const Chat = ({ isSmall, setShowChatsOrChatInfo }) => {
-  const [showGroupMembersModal,setShowMembersGroupModal] = useState(false);
-  const selectedChatId = useSelector((state) => state.chat.selectedChatId);
-  const chatStatus = useSelector((state) => state.chat.status);
 
-  console.log(showGroupMembersModal," ","@#$%^&*^%$%^&*((*&^%$#@#$%^&*(^%#$%^&\n");
-  
+// Redux Imports ======================================
+import { useSelector,useDispatch } from "react-redux";
+import { getChatAsync } from "../ChatSlice";
+import { fetchChatMessageAsync } from "../../messsage/MessageSlice";
+// ====================================================
+
+
+// JSX imports ===================================================
+import ChatMessageSend from "../../messsage/components/ChatMessageSend";
+import ChatMessages from "../../messsage/components/ChatMessages";
+// ===============================================================
+
+const Chat = ({
+  isSmall,
+  setShowChatsOrChatInfo,
+  seeChatDetails,
+  setAddGroupMembersModal,
+  socket,
+  setSeeChatDetails,
+}) => {
+  const dispatch = useDispatch();
+  const userId = useSelector((state) => state.auth.userId);
+  const [showGroupMembersModal, setShowMembersGroupModal] = useState(false);
+  const [chatInfo, setChatInfo] = useState();
+  const chat = useSelector((state) => state.chat);
+
+  console.log(
+    showGroupMembersModal,
+    " ",
+    "@#$%^&*^%$%^&*((*&^%$#@#$%^&*(^%#$%^&\n"
+  );
+
   useEffect(() => {
     //  load the chat information of the selected Chat is this
-    if (selectedChatId) {
+    if (seeChatDetails) {
+      console.log("SeeChatDetails ", seeChatDetails);
+      const help = async () => {
+        await dispatch(getChatAsync(seeChatDetails));
+        await dispatch(fetchChatMessageAsync(seeChatDetails));
+      };
+      help();
     }
-  }, [selectedChatId]);
-
-  // if (!selectedChatId ) return <div></div>;
-  // if( chatStatus == "loading" ){
-  //   // return Loading;
-  //   return (Loading);
+  }, [seeChatDetails]);
+  useEffect(() => {
+    setChatInfo(chat);
+  }, [chat]);
+  useEffect(() => {
+    setShowMembersGroupModal(false);
+  }, [seeChatDetails]);
+  if (!seeChatDetails) return <div></div>;
+  // if (chat.status == "loading" ) {
+  //   return <h1>Loading ...</h1>;
   // }
+  console.log(chat, " ", userId);
+  if( !chat ) return <div></div>
   return (
     <div className="w-full h-full rounded-xl shadow-2xl  bg-white relative border-1">
       <div
@@ -65,8 +66,10 @@ const Chat = ({ isSmall, setShowChatsOrChatInfo }) => {
         }  bg-white w-full h-full p-2 z-5 rounded-xl shadow-2xl `}
       >
         <ChatInfo
-          data={data}
+          chat={chat}
           setShowMembersGroupModal={setShowMembersGroupModal}
+          setAddGroupMembersModal={setAddGroupMembersModal}
+          setSeeChatDetails={setSeeChatDetails}
         />
       </div>
       <div className="w-full h-full p-2">
@@ -101,25 +104,40 @@ const Chat = ({ isSmall, setShowChatsOrChatInfo }) => {
           >
             <div className="profilePic w-1/15 lg:w-1/20 h-full p-1">
               <img
-                src={data.chatProfilePic}
+                src={
+                  "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
+                }
                 alt=""
                 className="contain w-full h-full rounded-full"
               />
             </div>
             <div className="w-14/15 lg:w-19/20 flex justify-between items-center">
-              <h1 className="">{data.chatName}</h1>
-              <button
+              <h1 className="">
+                {chat.chatName ||
+                  (chat?.members
+                    ? chat?.members[0]?._id == userId
+                      ? chat?.members[Math.min(chat.members.length - 1, 1)]
+                          ?.userName
+                      : chat?.members[0]?.userName
+                    : "")}
+                {chat.chatType == "SelfChat" ? " (You)" : ""}
+              </h1>
+              {/* <button
                 type="button"
                 className="cursor-pointer"
                 onClick={() => {}}
               >
                 <MoreVertIcon />
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
-        <div className="chatMessages w-full h-5/6 bg-indigo-600"></div>
-        <div className="chatInput h-1/12 w-full bg-amber-100"></div>
+        <div className="chatMessages w-full h-5/6 bg-indigo-600">
+          <ChatMessages seeChatDetails={seeChatDetails} />
+        </div>
+        <div className="chatInput h-1/12 w-full bg-amber-100">
+          <ChatMessageSend seeChatDetails={seeChatDetails} socket={socket} />
+        </div>
       </div>
     </div>
   );

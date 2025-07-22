@@ -1,11 +1,15 @@
 import { useState } from "react";
-import ChatMedia from "./ChatMedia"
-import ChatMembers from "./ChatMembers"
-const ChatInfo = ({data,setShowMembersGroupModal}) => {
-    const [groupInfoType, setGroupInfoType] = useState("members");
-        // console.log(
-        //   " @#$%^&*^%$%^&*((*&^%$#@#$%^&*(^%#$%^&\n"
-        // );
+import ChatMedia from "./components/ChatMedia";
+import GroupChatMembers from "./components/GroupChatMembers";
+import AboutChat from './components/AboutChat'
+const ChatInfo = ({
+  chat,
+  setShowMembersGroupModal,
+  setAddGroupMembersModal,
+  setSeeChatDetails,
+}) => {
+  const [groupInfoType, setGroupInfoType] = useState("about");
+  console.log(chat);
 
   return (
     <div className="h-full w-full">
@@ -18,24 +22,39 @@ const ChatInfo = ({data,setShowMembersGroupModal}) => {
           Close
         </button>
       </div>
-      <div className="info flex h-19/20 ">
+      <div className="info flex h-19/20">
         <div className="index w-1/10  h-full text-center">
           <button
             className={
               "cursor-pointer w-full " +
               `${
-                groupInfoType == "members" ? "border-l-4 border-l-green-500" : ""
+                groupInfoType == "about" ? "border-l-4 border-l-green-500" : ""
               }`
             }
-            onClick={() => setGroupInfoType("members")}
+            onClick={() => setGroupInfoType("about")}
           >
-            Members
+            About
           </button>
+          {chat.chatType == "GroupChat" && (
+            <button
+              className={
+                "cursor-pointer w-full " +
+                `${
+                  groupInfoType == "members"
+                    ? "border-l-4 border-l-green-500"
+                    : ""
+                }`
+              }
+              onClick={() => setGroupInfoType("members")}
+            >
+              Members
+            </button>
+          )}
           <button
             className={
               "cursor-pointer w-full " +
               `${
-                groupInfoType == "members" ? "":"border-l-4 border-l-green-500" 
+                groupInfoType == "media" ? "border-l-4 border-l-green-500" : ""
               }`
             }
             onClick={() => setGroupInfoType("media")}
@@ -44,8 +63,13 @@ const ChatInfo = ({data,setShowMembersGroupModal}) => {
           </button>
         </div>
         <div className="component w-9/10 h-full">
-          {(groupInfoType == "members") ? (
-            <ChatMembers data={data} />
+          {groupInfoType == "members" ? (
+            <GroupChatMembers
+              chat={chat}
+              setAddGroupMembersModal={setAddGroupMembersModal}
+            />
+          ) : groupInfoType == "about" ? (
+            <AboutChat chat={chat} setSeeChatDetails={setSeeChatDetails} />
           ) : (
             <ChatMedia />
           )}
@@ -53,6 +77,6 @@ const ChatInfo = ({data,setShowMembersGroupModal}) => {
       </div>
     </div>
   );
-}
+};
 
-export default ChatInfo
+export default ChatInfo;

@@ -18,6 +18,8 @@ const ProtectedPage = () => {
         }
       }
     },[userId,location]);
+    console.log("IN ProtectedPage ", userId);
+    
     if( !userId ){
       return <Navigate to="/auth/login" replace />;
     }

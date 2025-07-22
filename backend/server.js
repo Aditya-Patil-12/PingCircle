@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const {errorHandlerMiddleware,notFoundMiddleware} = require('./middleware');
-// =====================================
+// ================================================
 // config Folder Imports ======
 const {connectDB} = require('./.config');
 // ============================
@@ -60,32 +60,38 @@ const PORT= process.env.PORT || 5000;
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
-//   pingTimeout: 60000,
+  pingTimeout: 600000, // close the connection after 60 sec
   cors: {
     origin: "http://localhost:5173",
   },
 });
-console.log("Are we here ")
 io.on("connection",(socket)=>{
-    // console.log("New User Connected",socket.id);
+    console.log("New User Connected",socket.id);
     socket.on("joinPersonalChat",(userData)=>{
-        console.log("This data for setup", userData);
+        console.log("This data for setup in JoinPersonal Chat", userData);
         socket.join(userData._id);
-        socket.emit("connected", { data: "Het" });
+        socket.emit("connected", { data: "Personal Chat" });
     })
-    socket.on("joinChat",()=>{
-        console.log("This undefined", userData);
-        socket.join(userData._id);
+    socket.on("joinChat",(data)=>{
+        console.log("This Join Chat", data);
+        socket.join(data._id);
         socket.emit("connected",{ data:"This the join Chat ON" });
     })
-    socket.on("newMessage",(newMessageReceived)=>{
-        console.log("Received Message", newMessageReceived);
-        socket.emit("connected", { data: "This the newMessage Chat" });
-    })
-    socket.on("receiveNotification",(notification)=>{
 
+    socket.on("newMessage",(newMessageReceived)=>{
+        console.log(" Server Message Received Message ", newMessageReceived);
+        const members = newMessageReceived.chat.members,message=newMessageReceived.message;
+        for(let member of members){
+            if( member._id != message.sender._id ){
+            console.log(member._id);
+                socket
+                  .in(member._id)
+                  .emit("recieveNewMessage", newMessageReceived);
+            }
+        }
     })
 })
+
 
 
 const startServer = async ()=>{

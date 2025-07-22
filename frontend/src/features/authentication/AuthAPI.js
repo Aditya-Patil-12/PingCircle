@@ -135,6 +135,24 @@ const showMeUser = async () =>{
   }
 }
 
+const logoutUserAPI = async () =>{
+  try {
+    console.log("Hey API");
+
+    console.log("Starting Show Me User in Auth API ....");
+    // console.log(`${sliceURL}` + ``);
+
+    let resp = await axios.get(`${sliceURL}` + `logout`);
+    console.log("Server Response after Starting to Show Me in Auth API", resp);
+    if (!resp) {
+      throw new Error("");
+    }
+    return { data: resp.data.data, msg: resp.data.message, success: true };
+  } catch (error) {
+    return { msg: error?.response?.data?.message, success: false };
+  }
+}
+
 export {
   createUser,
   checkUser,
@@ -143,4 +161,5 @@ export {
   checkVerficationResult,
   resetPasswordUser,
   showMeUser,
+  logoutUserAPI,
 };

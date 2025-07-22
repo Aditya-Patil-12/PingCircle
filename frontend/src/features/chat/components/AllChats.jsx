@@ -1,68 +1,74 @@
 
 import { TextField } from '@mui/material';
 import { useState } from 'react';
-import { setSelectedChatId } from "../../chat/ChatSlice";
-import { useDispatch } from "react-redux";
-const data = [
-  { 
-    id:1,
-    name: "Aditya",
-    latestMessagg: "How Are You",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  { 
-    id:2,
-    name: "Navin",
-    latestMessagg: "How Are You ?",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  { 
-    id:3,
-    name: "Shakers",
-    latestMessagg: "What' going bro",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  { 
-    id:4,
-    name: "Coding & Concept",
-    latestMessagg: "Todays' Lecture on React",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-  { 
-    id:5,
-    name: "IIIT Pune Offial Info",
-    latestMessagg: "No class of Mahendra",
-    chatProfilePic:
-      "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  },
-];
+// Redux Imports =========
+import { useDispatch, useSelector } from "react-redux";
+// =======================
 
-const SingleUserChat = ({ chat, isSmall, setShowChatsOrChatInfo }) => {
+// chatId: "6869208a4fdfdff3b94a378a";
+// chatName: "No Chat Name default Value from mongoose";
+// chatPic: "String";
+// chatType: "direct";
+// currentMessage: null;
+// _id: "6869208a4fdfdff3b94a378d";
+const SingleUserChat = ({
+  chat,
+  isSmall,
+  setShowChatsOrChatInfo,
+  setSeeChatDetails,
+  seeChatDetails,
+}) => {
   const dispatch = useDispatch();
+  const userName = useSelector((state) => state.user.userName);
+  const userId = useSelector((state) => state.user.userId);
+  const members = useSelector((state) => state.chat.members);
+  const profilePic = useSelector((state) => state.user.profilePic);
+
+  console.log(chat,"  ",seeChatDetails);
+
   return (
     <div
-      className="w-full h-full cursor-pointer p-2 flex gap-x-2 hover:bg-gray-100"
+      className={
+        "w-full h-full cursor-pointer p-2 flex gap-x-2 hover:bg-gray-100 rounded-md " +
+        `${chat.chatId == seeChatDetails ? "bg-gray-200" : ""}`
+      }
       onClick={() => {
-        dispatch(setSelectedChatId(chat._id));
-         setShowChatsOrChatInfo(true);
-        }} 
+        if (isSmall) setShowChatsOrChatInfo(true);
+
+        setSeeChatDetails(chat.chatId);
+      }}
     >
       <div className="chatProfilePic w-1/10 h-full">
-        <img src={chat["chatProfilePic"]} alt="" className="rounded-full" />
+        <img
+          src={(chat.chatName == userName && profilePic) || chat["chatPic"]}
+          alt=""
+          className="rounded-full"
+        />
       </div>
       <div className="chatInfo w-9/10 h-full">
-        <h1 className="font-bold">{chat.name}</h1>
-        <p>{chat.latestMessagg}</p>
+        <h1 className="font-bold">
+          {chat.chatName}
+          {/* {chat.chatType == "direct" ? chat.chatName } */}
+          {/* members.length == 1 ? members[0].userName : members[0]._id == userId ?
+          members[1].userName : members[0].userName */}
+        </h1>
+        <p>{chat.currentMessage}</p>
       </div>
     </div>
   );
 };
-const AllChats = ({ setSelectedChat, isSmall, setShowChatsOrChatInfo }) => {
+const AllChats = ({
+  setSelectedChat,
+  isSmall,
+  setShowChatsOrChatInfo,
+  setSeeChatDetails,
+  seeChatDetails,
+}) => {
   const [chatSearchText, setChatSearchText] = useState("");
+  const user = useSelector((state) => state.user);
+  const chats = useSelector((state) => state.user?.chats);
+  console.log(chats);
+  console.log(user);
 
   return (
     <div className="h-full w-full px-2 bg-white rounded-xl shadow-2xl border-1 overflow-y-auto">
@@ -78,24 +84,27 @@ const AllChats = ({ setSelectedChat, isSmall, setShowChatsOrChatInfo }) => {
       </div>
       {/* Chats of User  */}
       <div className="userChat">
-        {data
-          .filter((chat) => {
-            if (chatSearchText == "") return true;
-            return chat.name
-              .toLowerCase()
-              .includes(chatSearchText.toLowerCase());
-          })
-          .map((chat, index) => {
-            return (
-              <SingleUserChat
-                chat={chat}
-                key={index}
-                isSmall={isSmall}
-                setShowChatsOrChatInfo={setShowChatsOrChatInfo}
-                setSelectedChat={setSelectedChat}
-              />
-            );
-          })}
+        {chats &&
+          chats
+            .filter((chat) => {
+              if (chatSearchText == "") return true;
+              return chat.chatName
+                .toLowerCase()
+                .includes(chatSearchText.toLowerCase());
+            })
+            .map((chat) => {
+              return (
+                <SingleUserChat
+                  chat={chat}
+                  key={chat._id}
+                  isSmall={isSmall}
+                  setShowChatsOrChatInfo={setShowChatsOrChatInfo}
+                  setSelectedChat={setSelectedChat}
+                  setSeeChatDetails={setSeeChatDetails}
+                  seeChatDetails={seeChatDetails}
+                />
+              );
+            })}
       </div>
     </div>
   );

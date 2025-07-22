@@ -150,7 +150,7 @@ const loginUser = async (req, res) => {
       .json(
         new ApiResponse(
           StatusCodes.OK,
-          { userName:user.userName, email: user.email, _id:user._id },
+          { userName:user.userName, email: user.email, _id:user._id,isEmailVerified:user.isEmailVerified },
           "Login Succesfull"
         )
       );
@@ -166,7 +166,7 @@ const loginUser = async (req, res) => {
   };
   await Token.create(userToken);
   attachCookiesToResponse({ res, payload: userTokenPayload, refreshToken });
-  const { userName, email: userEmail, _id } = user;
+  const { userName, email: userEmail, _id , isEmailVerified } = user;
   console.log("This the information to be sent ", { userName, email: userEmail, _id });
   
   return res
@@ -174,7 +174,7 @@ const loginUser = async (req, res) => {
     .json(
       new ApiResponse(
         StatusCodes.OK,
-        { userName, email: userEmail, _id },
+        { userName, email: userEmail, _id, isEmailVerified },
         "Login Succesfull"
       )
     );
@@ -203,7 +203,7 @@ const logoutUser = async (req, res) => {
   expireCookie({ res });
   return res
     .status(StatusCodes.OK)
-    .json(new ApiResponse(200, "Logout Succesfull"));
+    .json(new ApiResponse(200, {},"Logout Succesfull"));
 };
 
 const forgotPassword = async (req, res) => {
@@ -235,6 +235,8 @@ const verifyEmail = async (req,res)=>{
   }
   // TODO : Email of req.user == query email
 
+  console.log(user);
+  
 
   const emailVerificationToken = crypto.randomBytes(70).toString("hex");
 

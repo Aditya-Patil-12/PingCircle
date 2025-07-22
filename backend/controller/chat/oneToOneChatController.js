@@ -1,12 +1,13 @@
 const { OneToOneChat, User } = require("../../models");
 const {
-  ApiError,
   ApiResponse,
   checkForGroupAdmin,
   oneOnOneChatName,
+  createUserChat
 } = require("../../utils");
 
-const { notifyChatToUser,createUserChat } = require("../../utils");
+const ApiError = require('../../utils/ApiError')
+const { notifyChatToUser } = require("../../utils");
 
 const {addAChatToUser,deleteAChatOfUser} = require('../userController');
 
@@ -25,6 +26,7 @@ const createOneToOneChat = async (req, res) => {
     );
   }
   const otherUser = await User.findById(member);
+  const loggedUser = await User.findById(userId);
   if( !otherUser ){
     return ApiError(400,"Please Select Valid User");
   }
@@ -43,7 +45,7 @@ const createOneToOneChat = async (req, res) => {
     let newMembers = [...existingChat.members,userId];
     if( storedCheckId[0] == userId.toString() ){
       if( !existingChat.isDeletedByUser1 ){
-        throw new ApiError(400,"Chat Already Exists");        
+        throw new ApiError(400,"Chat Already Exists");
       }
       existingChat.isDeletedByUser1 = null;
       newMembers.reverse();
@@ -57,7 +59,8 @@ const createOneToOneChat = async (req, res) => {
     }
     await existingChat.set("members",newMembers);
     await existingChat.save();
-    await addAChatToUser(userId, createUserChat(existingChat, member));
+    await addAChatToUser(userId, createUserChat(existingChat, otherUser));
+    const newlyModifiedUser = await User.findById(userId);
     await existingChat
       .populate({
         path: "members",
@@ -71,6 +74,7 @@ const createOneToOneChat = async (req, res) => {
           checkId: existingChat.checkId,
           isDeletedByUser1:existingChat.isDeletedByUser1,
           isDeletedByUser2: existingChat.isDeletedByUser2,
+          userChat : newlyModifiedUser.chats.at(-1),
         },
         `Chat Already Exists`
       )
@@ -89,11 +93,19 @@ const createOneToOneChat = async (req, res) => {
     currentMessage: null,
     chatPic: member.profilePic,
   };
-  await notifyChatToUser(chatInfo, [member,userId]);
+  await notifyChatToUser(createUserChat(newChat,otherUser),[userId]);
+  await notifyChatToUser(
+    createUserChat(
+      newChat,
+      loggedUser
+    ),
+    [member]
+  );
   await newChat.populate({ path: "members", select: "userName email phoneNo profilePic chats" });
+  const newlyModifiedUser = await User.findById(userId);
     return res
     .status(201)
-    .json(new ApiResponse(201, newChat, `Chat Created Succesfully`));
+    .json(new ApiResponse(201, {...(newChat._doc),userChat: newlyModifiedUser.chats.at(-1)}, `Chat Created Succesfully`));
 };
 
 const exitOneToOneChat = async (req,res) =>{

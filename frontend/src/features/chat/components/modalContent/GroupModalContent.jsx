@@ -5,6 +5,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SingleUser from "./helper/SingleUser";
 import CloseIcon from "@mui/icons-material/Close";
 
+
+// redux & Slices  imports ===================
+import { useSelector,useDispatch } from "react-redux";
+import { searchUserAsync,addChatsToUser } from "../../../user/UserSlice";
+import { createChatAsync } from "../../ChatSlice";
+// =================================
 const FilteredUsers = ({
   users,
   searchUserName,
@@ -27,7 +33,8 @@ const FilteredUsers = ({
   //     );
   //   })
   // );
-
+  console.log(users);
+  
   if (!searchUserName) {
     // console.log("empty");
 
@@ -46,6 +53,7 @@ const FilteredUsers = ({
             return (
               <SingleUser
                 user={user}
+                key={user._id}
                 handleMembersChange={handleGroupChange}
                 setSearchUserName={setSearchUserName}
               />
@@ -71,6 +79,7 @@ const FilteredUsers = ({
           return (
             <SingleUser
               user={user}
+              key={user._id}
               handleMembersChange={handleGroupChange}
               setSearchUserName={setSearchUserName}
             />
@@ -83,43 +92,15 @@ const FilteredUsers = ({
 const GroupModalContent = ({
   setShowAddChatModal,
   options,
+  setSeeChatDetails,
   setOptions,
 }) => {
+    const dispatch = useDispatch();
+    const status = useSelector((state) => state.user.status);
   const [groupName, setGroupName] = useState("");
   const [searchUserName, setSearchUserName] = useState("");
 
-  const [matchingUser, setMatchingUser] = useState([
-    {
-      _id: 1,
-      userName: "Aditya",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 2,
-      userName: "Suraj",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 3,
-      userName: "Roshani",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 4,
-      userName: "Chandani",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 5,
-      userName: "Phulchand",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-  ]);
+  const [matchingUser, setMatchingUser] = useState([]);
 
   const [selectedGroupMembers, setSelectedGroupMembers] = useState(
     new Set([JSON.stringify({ _id: 0, userName: "Adi" })])
@@ -155,6 +136,16 @@ const GroupModalContent = ({
     return;
   };
 
+  useEffect(() => {
+    const timeOutId = setTimeout(async () => {
+      const data = await dispatch(searchUserAsync(searchUserName));
+      console.log("Result ::::::------:::::::", await data);
+      setMatchingUser(data.payload.users);
+    }, 2000);
+    return () => {
+      clearTimeout(timeOutId);
+    };
+  }, [searchUserName]);
   return (
     <div className="w-full h-full overflow-y-auto px-2 border-8">
       <div className="h-4/10 w-full">
@@ -220,12 +211,36 @@ const GroupModalContent = ({
             })}
           </div>
           <div className="createGroup col-span-1 text-center border-2">
-            <Button variant="contained" className="w-full" onClick={()=>{
-              // groupName searchUserName selectedGroupMembers
-              console.log(groupName," ",searchUserName," ",selectedGroupMembers);
-              
-              setShowAddChatModal(false);
-            }}>
+            <Button
+              variant="contained"
+              className="w-full"
+              onClick={async () => {
+                // groupName searchUserName selectedGroupMembers
+                console.log(
+                  groupName,
+                  " ",
+                  searchUserName,
+                  " ",
+                  selectedGroupMembers
+                );
+                const resp=await dispatch(
+                  createChatAsync({
+                    isGroupChat: true,
+                    members: [...selectedGroupMembers].map((member)=>JSON.parse(member)._id),
+                    chatName: groupName,
+                    chatProfilePic: "",
+                    groupType: "normal",
+                  })
+                );
+                console.log("Check this bro ",resp);
+                
+                if( resp.payload.success ){
+                  setSeeChatDetails(resp.payload._id);
+                  dispatch(addChatsToUser(resp.payload.userChat));
+                  setShowAddChatModal(false);
+                }
+              }}
+            >
               Create
             </Button>
           </div>
@@ -233,6 +248,8 @@ const GroupModalContent = ({
       </div>
       {/* User called from API    ========== */}
       <div className="availableUserOptions mt-2  w-full h-6/10">
+        {status == "loading" && <h1>Loading .....</h1>}
+        {searchUserName.trim() != "" && matchingUser.length == 0 &&  <h1>No User with give userName Found .....</h1>}
         <FilteredUsers
           searchUserName={searchUserName}
           setSearchUserName={setSearchUserName}

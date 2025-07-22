@@ -18,11 +18,11 @@ import { toast } from "react-toastify";
 import App from "./App.jsx";
 // ============================
 
-console.log(clientId);
+// console.log(clientId);
 
-console.log(window.origin)
+// console.log(window.origin)
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <GoogleOAuthProvider clientId={clientId} onScriptLoadSuccess={()=>{
       console.log("Google Consent Screen Loaded Successfully.......................");
     }}
@@ -35,6 +35,6 @@ createRoot(document.getElementById("root")).render(
         <App />
       </Provider>
     </GoogleOAuthProvider>
-  </StrictMode>
+  // {/* </StrictMode> */}
 );
 

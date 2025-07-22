@@ -3,21 +3,29 @@ import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SingleUser from "./helper/SingleUser";
+
+// redux & Slices  imports ===================
+import { useSelector,useDispatch } from "react-redux";
+import { searchUserAsync,addChatsToUser } from "../../../user/UserSlice";
+import { createChatAsync } from "../../ChatSlice";
+// =================================
 const FilteredUsers = ({
   users,
   searchUserName,
   handleGroupChange,
   setSearchUserName,
 }) => {
+  console.log(users," ",searchUserName);
   if (!searchUserName) {
     return (
       <>
         {users.map((user) => {
           return (
             <SingleUser
-              user={user}
-              handleMembersChange={handleGroupChange}
-              setSearchUserName={setSearchUserName}
+            user={user}
+            key={user._id}
+            handleMembersChange={handleGroupChange}
+            setSearchUserName={setSearchUserName}
             />
           );
         })}
@@ -26,61 +34,55 @@ const FilteredUsers = ({
   }
   return (
     <>
-      {users
+      {users.length > 0 && users
         .filter((user) =>
           user.userName.toLowerCase().includes(searchUserName.toLowerCase())
-        )
-        .map((user) => {
-          return (
-            <SingleUser
-              user={user}
-              handleMembersChange={handleGroupChange}
-              setSearchUserName={setSearchUserName}
-            />
-          );
-        })}
+      )
+      .map((user) => {
+        return (
+          <SingleUser
+          user={user}
+          key={user._id}
+          handleMembersChange={handleGroupChange}
+          setSearchUserName={setSearchUserName}
+          />
+        );
+      })}
     </>
   );
 };
-const OneToOneModalContent = ({ setShowAddChatModal, options, setOptions }) => {
+const OneToOneModalContent = ({ setShowAddChatModal, options, setOptions,setSeeChatDetails }) => {
+  const dispatch = useDispatch();
+  const status = useSelector((state)=> state.user.status )
   const [searchUserName, setSearchUserName] = useState("");
-  const [matchingUser, setMatchingUser] = useState([
-    {
-      _id: 1,
-      userName: "Aditya",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 2,
-      userName: "Suraj",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 3,
-      userName: "Roshani",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 4,
-      userName: "Chandani",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-    {
-      _id: 5,
-      userName: "Phulchand",
-      chatProfilePic:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-    },
-  ]);
-  console.log(matchingUser);
-  const handleGroupChange = (user,_) => {
+  const [matchingUser, setMatchingUser] = useState([]);
+  console.log(matchingUser," ",status);
+  const handleGroupChange = async (user,_) => {
     console.log(user);
-    setShowAddChatModal(false);
+    const resp  = await dispatch(createChatAsync({
+      isGroupChat:false,
+      member:user._id,
+    }));
+    console.log("response recieved",resp);
+    
+    if( resp.payload.success ){
+        setSeeChatDetails(resp.payload._id);
+        dispatch(addChatsToUser(resp.payload.userChat));
+      }
+      setShowAddChatModal(false);
   };
+  
+
+  useEffect(()=>{
+    const timeOutId = setTimeout(async ()=>{
+      const data = await dispatch(searchUserAsync(searchUserName));
+      console.log("Result ::::::------:::::::",await data);
+      setMatchingUser(data.payload.users);
+    },2000);
+    return () =>{
+      clearTimeout(timeOutId);
+    }
+  },[searchUserName]);
   return (
     <div className="w-full h-full overflow-y-auto px-2">
       <div className="closeIcon flex justify-between">
@@ -112,6 +114,11 @@ const OneToOneModalContent = ({ setShowAddChatModal, options, setOptions }) => {
         />
       </div>
       <div className="availableUserOptions mt-2">
+        {status == "loading" && <h1>Loading .....</h1>}
+        {searchUserName.trim() != "" && matchingUser.length == 0 && (
+          <h1>No User with give userName Found .....</h1>
+        )}
+
         <FilteredUsers
           users={matchingUser}
           searchUserName={searchUserName}
